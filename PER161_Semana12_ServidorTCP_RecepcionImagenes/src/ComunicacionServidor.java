@@ -38,6 +38,12 @@ public class ComunicacionServidor extends Thread implements Observer {
 		}
 	}
 
+	/**
+	 * Metodo encargado de recibir a los clientes, agregarlos a la lista de clientes e
+	 * iniciar el hilo del nuevo, es llamado desde el metodo run
+	 * 
+	 * @exception IOException en caso de no poder aceptar al cliente en el {@link Socket} 
+	 * */
 	private void recibirClientes() throws IOException {
 		Socket s = ss.accept();
 		ControlCliente nuevo = new ControlCliente(s, app);

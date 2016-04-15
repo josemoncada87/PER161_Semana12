@@ -17,22 +17,25 @@ public class ComunicacionCliente extends Thread {
 	private Socket s;
 	private ObjectInputStream entrada;
 	private ObjectOutputStream salida;
-	PApplet app;
+	private PApplet app;
 
 	public ComunicacionCliente(PApplet app) {
 		System.out.println("inciando cliente com");
 		this.app = app;
 		try {
+			System.out.print("Conexión con el servidor ...");
 			s = new Socket(InetAddress.getByName("127.0.0.1"), 6001);
-			System.out.println("socket");
-
+			System.out.println("OK");
+			
+			System.out.print("Creación flujo de salida ...");
 			salida = new ObjectOutputStream(new BufferedOutputStream(
 					s.getOutputStream()));
-			System.out.println("salida");
+			System.out.println("OK");
 
+			System.out.print("Creación flujo de entrada ...");
 			entrada = new ObjectInputStream(new BufferedInputStream(
 					s.getInputStream()));
-			System.out.println("entrada");
+			System.out.println("OK");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -42,12 +45,11 @@ public class ComunicacionCliente extends Thread {
 	@Override
 	public void run() {
 		try {
-			recibirSaludo();
+			recibirSaludo();			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		while (true) {
-			System.out.println("Fui saludado!!");
 			try {
 				enviarImagen(app.sketchPath("") + "../data/Koala.jpg");
 				break;
@@ -59,7 +61,7 @@ public class ComunicacionCliente extends Thread {
 
 	private void recibirSaludo() throws IOException {
 		byte[] buf = new byte[512];
-		String recibido = "nada de nada";
+		String recibido = "Nan";
 		try {
 			recibido = (String) entrada.readObject();
 		} catch (ClassNotFoundException e) {
@@ -71,27 +73,26 @@ public class ComunicacionCliente extends Thread {
 	private void enviarImagen(String path) throws FileNotFoundException {
 		try {
 			File file = new File(path);
-			System.out.println(file.getAbsolutePath());
+			//System.out.println(file.getAbsolutePath());
 			FileInputStream fis = new FileInputStream(file);
 			int tam = fis.available();
 			salida.writeInt(tam);
 			byte[] buf = new byte[tam];
 			System.out.println(fis.read(buf) == tam ? "carga completa"
 					: "no se cargó la imagen");
+			fis.close();
 			// Forma 1 - envio secuencial
-			//	int i = 0;
-			//	while (i < tam) {
+			// int i = 0;
+			// while (i < tam) {
 			//		salida.write((byte)buf[i]);
 			//		i++;
-			//	}
-			// Forma 2 - envio unico
+			// }
+			// Forma 2 - envío único
 			salida.write(buf);			
-			
 			salida.flush();
-			System.out.println("FIN Comunicacion Cliente....");
+			System.out.println("Imagen Enviada");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 }

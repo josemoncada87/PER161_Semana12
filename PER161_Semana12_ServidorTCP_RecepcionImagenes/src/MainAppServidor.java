@@ -8,17 +8,17 @@ public class MainAppServidor extends PApplet {
 
 	@Override
 	public void setup() {
-		System.out.print("INICIANDO ... ");
+		System.out.print("[INICIANDO ... ");
 		com = new ComunicacionServidor(this);
 		com.start();
-		System.out.println("ESPERANDO");
+		System.out.println("OK]");
 	}
 
 	@Override
 	public void draw() {
-		background(255);
+		/*background(255);
 		fill(0);
-		ellipse(mouseX, mouseY, 20, 20);
+		ellipse(mouseX, mouseY, 20, 20);*/
 	}
 
 }
