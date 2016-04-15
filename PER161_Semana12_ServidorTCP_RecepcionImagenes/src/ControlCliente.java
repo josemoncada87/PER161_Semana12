@@ -1,6 +1,7 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,57 +24,58 @@ public class ControlCliente extends Observable implements Runnable {
 		this.s = s;
 		this.app = app;
 		try {
-			System.out.println("antes");
-			salida = new ObjectOutputStream(new BufferedOutputStream(
-					s.getOutputStream()));
-			salida.writeObject(new String("hola amiwito"));
+			salida = new ObjectOutputStream(new BufferedOutputStream(s.getOutputStream()));
+			salida.writeObject(new String("Saludo desde el servidor"));
 			salida.flush();
-			System.out.println("despues");
-			entrada = new ObjectInputStream(new BufferedInputStream(
-					s.getInputStream()));
-			System.out.println("final");
+			entrada = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
 	public void run() {
 		while (true) {
 			try {
-				recibir();
+				if(guardarImagen(recibirImagen())){
+					System.out.println("imagen recibida y guardada");
+				}
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (IOException e) {				
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public void recibir() {
+	public byte[] recibirImagen() throws IOException {
+		int tam = entrada.readInt();
+		byte[] buf = new byte[tam];
+		/** Forma 1 - lectura secuencial */
+		// int i = 0;
+		// while (i < tam) {
+		// buf[i] = (byte) entrada.read();
+		// i++;
+		// }
+		/** Forma 2 - lectura completa */
+		entrada.readFully(buf);
+		return buf;
+	}
+	
+	public boolean guardarImagen(byte[] buf){			
 		try {
-			int tam = entrada.readInt();
-			System.out.println("tamaño a leer: " + tam);
-			byte[] buf = new byte[tam];
-			int i = 0;
-			while (i < tam) {
-				buf[i] = (byte) entrada.read();
-				i++;
-			}
-			File file = new File(app.sketchPath("") + "../data/Koala8.jpg");
+			File file = new File(app.sketchPath("") + "../data/KoalaA.jpg");
 			FileOutputStream fos = new FileOutputStream(file);
-			/*i = 0;
-			while (i < tam) {
-				fos.write(buf[i]);
-				i++;
-			}*/
 			fos.write(buf);
 			fos.flush();
 			fos.close();
-			System.out.println("Fin Control Cliente");
-		} catch (IOException e) {
+			return true;
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-
+		} catch (IOException e) {			
+			e.printStackTrace();
+		}		
+		return false;		
 	}
 }

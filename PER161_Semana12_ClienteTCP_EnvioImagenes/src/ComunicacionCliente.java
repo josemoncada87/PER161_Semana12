@@ -78,11 +78,15 @@ public class ComunicacionCliente extends Thread {
 			byte[] buf = new byte[tam];
 			System.out.println(fis.read(buf) == tam ? "carga completa"
 					: "no se cargó la imagen");
-			int i = 0;
-			while (i < tam) {
-				salida.write((byte)buf[i]);
-				i++;
-			}
+			// Forma 1 - envio secuencial
+			//	int i = 0;
+			//	while (i < tam) {
+			//		salida.write((byte)buf[i]);
+			//		i++;
+			//	}
+			// Forma 2 - envio unico
+			salida.write(buf);			
+			
 			salida.flush();
 			System.out.println("FIN Comunicacion Cliente....");
 		} catch (IOException e) {
